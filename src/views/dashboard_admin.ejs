@@ -37,12 +37,13 @@
 
   async function load() {
     const me = await getMe();
-    // SOLO usuarios con rol 'admin'
-    if (!me.roles.map(r => r.name).includes('admin')) {
+    // Validación robusta para rol admin
+    const isAdmin = Array.isArray(me.roles)
+      && (me.roles.includes('admin') || me.roles.some(r => r.name === 'admin'));
+    if (!isAdmin) {
       location.href = '/403';
       return;
     }
-    // Si quieres refrescar la tabla vía fetch, descomenta lo siguiente:
     try {
       const res = await fetchWithAuth('/api/users');
       if (!res.ok) {
@@ -61,7 +62,7 @@
           <td>${u.lastName ?? ''}</td>
           <td>${u.email}</td>
           <td>${u.phoneNumber ?? ''}</td>
-          <td>${(u.roles || []).map(r => r.name).join(', ')}</td>
+          <td>${(u.roles || []).map(r => r.name ?? r).join(', ')}</td>
           <td>${new Date(u.createdAt || u.created_at).toLocaleDateString()}</td>
           <td>
             <a href="/users/${u._id}" class="btn-small blue">Ver info</a>

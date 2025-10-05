@@ -61,6 +61,7 @@ class AuthService {
   }
 
   async signIn({ email, password }) {
+    // Busca el usuario y popula los roles para obtener los nombres
     const user = await userRepository.findByEmail(email);
     if (!user) {
       const err = new Error('Credenciales inválidas');
@@ -75,8 +76,18 @@ class AuthService {
       throw err;
     }
 
+    // Si los roles son ObjectId, popula los nombres
+    let roleNames = [];
+    if (user.roles && user.roles.length && typeof user.roles[0] !== 'string') {
+      // Si los roles no tienen 'name', hay que poblarlos
+      const populatedUser = await userRepository.findById(user._id);
+      roleNames = (populatedUser.roles || []).map(r => r.name);
+    } else {
+      roleNames = user.roles;
+    }
+
     const token = jwt.sign(
-      { sub: user._id, roles: user.roles.map(r => r.name) },
+      { sub: user._id, roles: roleNames },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );

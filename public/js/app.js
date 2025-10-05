@@ -1,6 +1,5 @@
 const API_BASE = `${location.protocol}//${location.host}/api`;
 
-// ── Helpers de auth ──────────────────────────────────────────────
 export function saveToken(token) {
   sessionStorage.setItem('token', token);
 }
@@ -13,6 +12,11 @@ export function clearToken() {
   sessionStorage.removeItem('token');
 }
 
+export function logout() {
+  clearToken();
+  location.href = '/'; // Redirige al login
+}
+
 export async function fetchWithAuth(url, options = {}) {
   const token = getToken();
   const headers = {
@@ -21,10 +25,10 @@ export async function fetchWithAuth(url, options = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   };
   const res = await fetch(url, { ...options, headers });
-  // Si expiró o no autorizado ⇒ a SignIn
+  // Si expiró o no autorizado ⇒ a "/"
   if (res.status === 401) {
     clearToken();
-    location.href = '/signIn';
+    location.href = '/';
     return;
   }
   return res;
@@ -39,7 +43,7 @@ export async function getMe() {
 export function ensureAuthOrRedirect() {
   const token = getToken();
   if (!token) {
-    location.href = '/signIn';
+    location.href = '/';
   }
 }
 

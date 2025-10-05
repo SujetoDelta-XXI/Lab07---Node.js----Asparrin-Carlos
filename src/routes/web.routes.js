@@ -1,44 +1,47 @@
 import { Router } from 'express';
 import authenticate from '../middlewares/authenticate.js';
+import authorize from '../middlewares/authorize.js';
 import userRepository from '../repositories/UserRepository.js';
 
 const router = Router();
 
-// Página de inicio (login)
-router.get('/', (req, res) => {
-  res.render('signin'); // O 'home' si tienes una vista de bienvenida
-});
+// Página de inicio -> SignIn
+router.get('/', (req, res) => res.render('signin'));
 
-// Página de registro
+// Rutas explícitas de vistas
+router.get('/signIn', (req, res) => res.render('signin'));
 router.get('/signUp', (req, res) => res.render('signup'));
 
-// Dashboard: solo users y admins
 router.get('/dashboard', authenticate, async (req, res) => {
-  const user = await userRepository.findById(req.userId);
-  const roles = (user.roles || []).map(r => r.name);
+  const user = await userRepository.findById(req.userId); // roles poblados
+  if (!user) return res.redirect('/403');
 
+  const roles = (user.roles || []).map(r => r.name);
   if (roles.includes('admin')) {
-    const users = await userRepository.findAll();
-    res.render('dashboard_admin', { users });
+    res.render('dashboard_admin', { users: [] }); // admin
   } else if (roles.includes('user')) {
-    res.render('dashboard_user', { user });
+    res.render('dashboard_user', { user });       // usuario normal
   } else {
-    res.status(403).render('403');
+    res.redirect('/403');
   }
 });
 
-// Perfil de usuario (autenticado)
+// Vista de detalle de usuario (solo admin)
+router.get('/users/:id', authenticate, authorize(['admin']), (req, res) => {
+  res.render('user_detail');
+});
+
+// Perfil del usuario autenticado
 router.get('/profile', authenticate, async (req, res) => {
   const me = await userRepository.findById(req.userId);
   res.render('profile', { user: me });
 });
 
-// Ruta acceso denegado (403)
-router.get('/403', (req, res) => {
-  res.status(403).render('403');
-});
+// Vista para editar el perfil
+router.get('/profile/edit', authenticate, (req, res) => res.render('profile_edit'));
 
-// Catch-all para 404
+// Páginas de error
+router.get('/403', (req, res) => res.status(200).render('403'));
 router.get('*', (req, res) => res.status(404).render('404'));
 
 export default router;

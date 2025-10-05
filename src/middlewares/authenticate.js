@@ -1,10 +1,12 @@
+// src/middlewares/authenticate.js (REEMPLAZO COMPLETO)
 import jwt from 'jsonwebtoken';
+import userRepository from '../repositories/UserRepository.js';
 
-export default function authenticate(req, res, next) {
+export default async function authenticate(req, res, next) {
   try {
     let token = null;
 
-    // ✅ Buscar token en header (para Postman) o en cookie (para navegador)
+    // header o cookie
     const header = req.headers.authorization;
     if (header && header.startsWith('Bearer ')) {
       token = header.split(' ')[1];
@@ -17,11 +19,19 @@ export default function authenticate(req, res, next) {
     }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = payload.sub;
-    req.userRoles = payload.roles || [];
+
+    // usuario con roles poblados
+    const user = await userRepository.findById(payload.sub);
+    if (!user) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    req.user = user;
+    req.userId = user._id;
+    req.userRoles = (user.roles || []).map(r => r.name); // ✅ para authorize()
 
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: 'Token no válido o caducado' });
   }
 }
