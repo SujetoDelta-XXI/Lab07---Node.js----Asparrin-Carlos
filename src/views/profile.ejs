@@ -25,8 +25,8 @@
           <li class="collection-item"><b>Teléfono:</b> ${me.phoneNumber ?? ''}</li>
           <li class="collection-item"><b>Edad:</b> ${age} años</li>
 
-          <li class="collection-item"><b>Roles:</b> ${(me.roles || []).map(r => r.name).join(', ')}</li>
-          
+          <li class="collection-item"><b>Roles:</b> ${(me.roles || []).join(', ')}</li>
+
           <li class="collection-item"><b>Dirección:</b> ${me.adress ?? ''}</li>
         </ul>
       `;

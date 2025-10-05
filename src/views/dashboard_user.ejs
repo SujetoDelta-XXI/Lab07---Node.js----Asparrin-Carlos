@@ -1,0 +1,30 @@
+<% layout('_layout') -%>
+<section class="container">
+  <h3 class="center-align">Bienvenido, aquí están tus datos</h3>
+  <div class="card">
+    <div class="card-content">
+      <p><b>Nombre:</b> <%= user.name %></p>
+      <p><b>Apellido:</b> <%= user.lastName %></p>
+      <p><b>Email:</b> <%= user.email %></p>
+      <p><b>Teléfono:</b> <%= user.phoneNumber %></p>
+      <p><b>Roles:</b> <%= (user.roles || []).map(r => r.name).join(', ') %></p>
+      <p><b>Fecha de registro:</b> <%= new Date(user.createdAt).toLocaleDateString() %></p>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  import { ensureAuthOrRedirect, getMe } from '/js/app.js';
+  ensureAuthOrRedirect();
+
+  async function load() {
+    const me = await getMe();
+    // SOLO usuarios con rol 'user' (no admin)
+    if (!me.roles.map(r => r.name).includes('user')) {
+      location.href = '/403';
+      return;
+    }
+    // Puedes mostrar un saludo dinámico aquí si lo deseas
+  }
+  load();
+</script>
