@@ -3,52 +3,73 @@ import userRepository from '../repositories/UserRepository.js';
 import roleRepository from '../repositories/RoleRepository.js';
 
 /**
- * Crea dos usuarios iniciales: uno admin y otro normal
+ * Crea dos usuarios iniciales: uno admin y otro normal,
+ * llenando todos los campos definidos en el modelo User.
  */
 export default async function seedUsers() {
   try {
-    // Roles requeridos
-    const adminRole = await roleRepository.findByName('admin') ||
-      await roleRepository.create({ name: 'admin' });
+    // ── 1. Verificar y crear roles ──────────────────────────────
+    const adminRole =
+      (await roleRepository.findByName('admin')) ||
+      (await roleRepository.create({ name: 'admin' }));
 
-    const userRole = await roleRepository.findByName('user') ||
-      await roleRepository.create({ name: 'user' });
+    const userRole =
+      (await roleRepository.findByName('user')) ||
+      (await roleRepository.create({ name: 'user' }));
 
-    // Usuarios iniciales
+    // ── 2. Usuarios iniciales con todos los campos ─────────────
     const usersToSeed = [
       {
-        name: 'Admin Seed',
+        name: 'Carlos',
+        lastName: 'Administrador',
         email: 'admin@demo.com',
-        password: 'Admin#2025',
+        password: 'Admin#2025', // cumple reglas: 8+ / 1 mayús / 1 dígito / 1 especial
+        phoneNumber: '999111222',
+        birthdate: new Date('1990-03-15'),
+        url_profile: 'https://via.placeholder.com/150?text=Admin',
+        adress: 'Av. Siempre Viva 123, Lima, Perú',
         roles: [adminRole._id]
       },
       {
-        name: 'User Seed',
+        name: 'Lucía',
+        lastName: 'Usuario',
         email: 'user@demo.com',
         password: 'User#2025',
+        phoneNumber: '988555444',
+        birthdate: new Date('2002-07-20'),
+        url_profile: 'https://via.placeholder.com/150?text=User',
+        adress: 'Jr. Los Cedros 456, Lima, Perú',
         roles: [userRole._id]
       }
     ];
 
+    // ── 3. Crear los usuarios si no existen ───────────────────
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS ?? '10', 10);
+
     for (const u of usersToSeed) {
       const exists = await userRepository.findByEmail(u.email);
+
       if (!exists) {
-        const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS ?? '10', 10);
-        const hashed = await bcrypt.hash(u.password, saltRounds);
+        const hashedPassword = await bcrypt.hash(u.password, saltRounds);
 
         await userRepository.create({
           name: u.name,
+          lastName: u.lastName,
           email: u.email,
-          password: hashed,
+          password: hashedPassword,
+          phoneNumber: u.phoneNumber,
+          birthdate: u.birthdate,
+          url_profile: u.url_profile,
+          adress: u.adress,
           roles: u.roles
         });
 
-        console.log(`Usuario creado: ${u.email}`);
+        console.log(`✅ Usuario creado: ${u.email}`);
       } else {
-        console.log(`Usuario ya existe: ${u.email}`);
+        console.log(`ℹ️ Usuario ya existe: ${u.email}`);
       }
     }
   } catch (error) {
-    console.error('Error al sembrar usuarios iniciales:', error);
+    console.error('❌ Error al sembrar usuarios iniciales:', error);
   }
 }

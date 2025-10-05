@@ -1,0 +1,65 @@
+<% layout('_layout') -%>
+<section class="container">
+  <h3 class="center-align">Dashboard</h3>
+  <table class="striped highlight centered responsive-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Rol</th>
+        <th>Fecha registro</th>
+      </tr>
+    </thead>
+    <tbody id="rows">
+      <% users.forEach(u => { %>
+        <tr>
+          <td><%= u.name %></td>
+          <td><%= u.lastName %></td>
+          <td><%= u.email %></td>
+          <td><%= u.phoneNumber %></td>
+          <td><%= u.roles.map(r => r.name).join(', ') %></td>
+          <td><%= new Date(u.createdAt).toLocaleDateString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</section>
+
+
+<script type="module">
+  import { ensureAuthOrRedirect, getMe, fetchWithAuth } from '/js/app.js';
+  ensureAuthOrRedirect();
+
+  async function load() {
+    // Verificar rol
+    const me = await getMe();
+    if (!(me.roles || []).includes('admin')) {
+      location.href = '/403';
+      return;
+    }
+
+    const res = await fetchWithAuth(`${location.protocol}//${location.host}/api/users`);
+    if (!res.ok) {
+      if (res.status === 403) { location.href = '/403'; return; }
+      M.toast({html:'No se pudo cargar usuarios', classes:'red'});
+      return;
+    }
+    const users = await res.json();
+
+    const tbody = document.getElementById('rows');
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td>${u.name ?? ''}</td>
+        <td>${u.lastName ?? ''}</td>
+        <td>${u.email}</td>
+        <td>${u.phoneNumber ?? ''}</td>
+        <td>${(u.roles || []).map(r => r.name).join(', ')}</td>
+        <td>${new Date(u.createdAt || u.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  }
+
+  load();
+</script>

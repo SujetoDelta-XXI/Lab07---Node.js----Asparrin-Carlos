@@ -4,20 +4,36 @@ import cors from "cors";
 import mongoose from 'mongoose';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/users.routes.js';
+import webRoutes from './routes/web.routes.js';
 import seedRoles from './utils/seedRoles.js';
 import seedUsers from './utils/seedUsers.js';
+import ejsMate from 'ejs-mate';
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 const app = express();
+app.engine('ejs', ejsMate);  
+
+// EJS
+app.set('view engine', 'ejs');
+app.set('views', './src/views');
+
+// Estáticos
+app.use(express.static('public'));
 
 // Habilitar CORS para todos
 app.use(cors());
 
 app.use(express.json());
 
-// Rutas
+app.use(cookieParser());
+
+// Rutas API
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+
+// Rutas WEB (EJS)
+app.use('/', webRoutes);
 
 // Validar estado del servidor
 app.get('/health', (req, res) => res.status(200).json({ ok: true }));

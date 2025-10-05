@@ -1,0 +1,45 @@
+<% layout('_layout') -%>
+<section class="card">
+  <div class="card-content">
+    <span class="card-title">Mi cuenta</span>
+    <div id="info"></div>
+    <div class="section">
+      <a class="btn red" id="logoutBtn"><i class="material-icons left">exit_to_app</i>Cerrar sesión</a>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  import { ensureAuthOrRedirect, getMe, clearToken, calcAge } from '/js/app.js';
+
+  ensureAuthOrRedirect();
+
+  async function load() {
+    try {
+      const me = await getMe();
+      const age = calcAge(me.birthdate);
+      document.getElementById('info').innerHTML = `
+        <ul class="collection">
+          <li class="collection-item"><b>Nombre:</b> ${me.name} ${me.lastName ?? ''}</li>
+          <li class="collection-item"><b>Email:</b> ${me.email}</li>
+          <li class="collection-item"><b>Teléfono:</b> ${me.phoneNumber ?? ''}</li>
+          <li class="collection-item"><b>Edad:</b> ${age} años</li>
+
+          <li class="collection-item"><b>Roles:</b> ${(me.roles || []).map(r => r.name).join(', ')}</li>
+          
+          <li class="collection-item"><b>Dirección:</b> ${me.adress ?? ''}</li>
+        </ul>
+      `;
+    } catch (e) {
+      M.toast({html:'Sesión inválida', classes:'red'});
+      location.href='/signIn';
+    }
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    clearToken();
+    location.href = '/signIn';
+  });
+
+  load();
+</script>
