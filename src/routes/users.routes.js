@@ -2,7 +2,7 @@ import express from 'express';
 import UserController from '../controllers/UserController.js';
 import authenticate from '../middlewares/authenticate.js';
 import authorize from '../middlewares/authorize.js';
-import userRepository from '../repositories/UserRepository.js';  // ✅ faltaba esto
+import userRepository from '../repositories/UserRepository.js'; // necesario para el PUT /me
 
 const router = express.Router();
 
@@ -19,7 +19,6 @@ router.put('/me', authenticate, async (req, res, next) => {
     const user = await userRepository.findById(req.userId);
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    // Solo el dueño puede modificar sus propios datos
     user.name = name ?? user.name;
     user.lastName = lastName ?? user.lastName;
     user.phoneNumber = phoneNumber ?? user.phoneNumber;
@@ -32,5 +31,8 @@ router.put('/me', authenticate, async (req, res, next) => {
     next(err);
   }
 });
+
+// 🆕 Obtener usuario por ID (solo admin)
+router.get('/:id', authenticate, authorize(['admin']), UserController.getById);
 
 export default router;

@@ -4,63 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title><%= typeof title !== 'undefined' ? title : 'App JWT' %></title>
+
   <!-- Materialize CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
   <!-- Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   
   <style>
-  body {
-    background: #ffffff; /* fondo blanco */
-    color: #333;
-  }
-  nav, .page-footer {
-    background-color: #c62828 !important; /* rojo */
-  }
-  .btn,
-  .btn-large {
-    background-color: #c9a300 !important; /* dorado */
-    color: #ffffff !important;
-  }
-  .btn:hover {
-    background-color: #b38e00 !important; /* dorado más oscuro al pasar mouse */
-  }
-  .card {
-    border-radius: 16px;
-  }
-  .brand-logo {
-    font-weight: bold;
-  }
-  footer .white-text {
-    font-size: 0.9rem;
-  }
+    body {
+      background: #ffffff;
+      color: #333;
+    }
+    nav, .page-footer {
+      background-color: #c62828 !important; /* rojo */
+    }
+    .btn,
+    .btn-large {
+      background-color: #c9a300 !important; /* dorado */
+      color: #ffffff !important;
+    }
+    .btn:hover {
+      background-color: #b38e00 !important; /* dorado más oscuro al pasar mouse */
+    }
+    .card {
+      border-radius: 16px;
+    }
+    .brand-logo {
+      font-weight: bold;
+    }
+    footer .white-text {
+      font-size: 0.9rem;
+    }
 
-  /* 🔥 Estilos especiales para Dashboard */
-  table.striped thead {
-    background-color: #c62828;       /* rojo */
-  }
-  table.striped thead th {
-    color: #fff;
-    font-weight: bold;
-  }
-  table.striped tbody tr:hover {
-    background-color: #fff5e0;       /* dorado claro al pasar mouse */
-  }
-  table.striped td, table.striped th {
-    padding: 12px 15px;
-  }
-</style>
-
+    /* 🔥 Estilos especiales para Dashboard */
+    table.striped thead {
+      background-color: #c62828;       /* rojo */
+    }
+    table.striped thead th {
+      color: #fff;
+      font-weight: bold;
+    }
+    table.striped tbody tr:hover {
+      background-color: #fff5e0;       /* dorado claro al pasar mouse */
+    }
+    table.striped td, table.striped th {
+      padding: 12px 15px;
+    }
+  </style>
 </head>
 <body>
   <nav class="blue">
     <div class="nav-wrapper container">
       <a href="/" class="brand-logo">JWT App</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="/signIn">Sign In</a></li>
-        <li><a href="/signUp">Sign Up</a></li>
-        <li><a href="/profile">Mi Perfil</a></li>
-        <li><a href="/dashboard">Dashboard</a></li>
+        <!-- enlaces visibles SOLO si NO hay sesión -->
+        <li class="guest"><a href="/signIn">Sign In</a></li>
+        <li class="guest"><a href="/signUp">Sign Up</a></li>
+
+        <!-- enlaces visibles SOLO si HAY sesión -->
+        <li class="auth"><a href="/profile">Mi Perfil</a></li>
+        <li class="auth"><a href="/dashboard">Dashboard</a></li>
       </ul>
     </div>
   </nav>
@@ -77,7 +80,16 @@
 
   <!-- Materialize JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
   <!-- Frontend helpers -->
   <script type="module" src="/js/app.js"></script>
+
+  <!-- 🔑 Control dinámico del menú -->
+  <script type="module">
+    import { getToken } from '/js/app.js';
+    const logged = !!getToken();               // true si hay token
+    document.querySelectorAll('.guest').forEach(li => li.style.display = logged ? 'none' : '');
+    document.querySelectorAll('.auth').forEach(li => li.style.display = logged ? '' : 'none');
+  </script>
 </body>
 </html>

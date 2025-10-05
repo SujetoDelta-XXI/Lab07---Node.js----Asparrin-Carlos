@@ -3,9 +3,12 @@ import userRepository from '../repositories/UserRepository.js';
 class UsersController {
   async getAll(req, res, next) {
     try {
-      if (!req.userRoles?.includes('admin')) {
+      // Verificamos rol admin
+      const isAdmin = req.user?.roles?.some(r => r.name === 'admin');
+      if (!isAdmin) {
         return res.status(403).json({ message: 'Acceso denegado' });
       }
+
       const users = await userRepository.findAll().select('-password');
       const usersData = users.map(u => ({
         ...u.toObject(),
@@ -32,11 +35,9 @@ class UsersController {
     }
   }
 
-  // 🆕 Mostrar datos completos de cualquier usuario (solo admin)
   async getById(req, res, next) {
     try {
-      const { id } = req.params;
-      const user = await userRepository.findById(id).select('-password');
+      const user = await userRepository.findById(req.params.id).select('-password');
       if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
       res.json({
