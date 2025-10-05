@@ -2,10 +2,7 @@ import bcrypt from 'bcrypt';
 import userRepository from '../repositories/UserRepository.js';
 import roleRepository from '../repositories/RoleRepository.js';
 
-/**
- * Crea dos usuarios iniciales: uno admin y otro normal,
- * llenando todos los campos definidos en el modelo User.
- */
+
 export default async function seedUsers() {
   try {
     // ── 1. Verificar y crear roles ──────────────────────────────
@@ -23,7 +20,7 @@ export default async function seedUsers() {
         name: 'Carlos',
         lastName: 'Administrador',
         email: 'admin@demo.com',
-        password: 'Admin#2025', // cumple reglas: 8+ / 1 mayús / 1 dígito / 1 especial
+        password: 'Admin#2025',
         phoneNumber: '999111222',
         birthdate: new Date('1990-03-15'),
         url_profile: 'https://via.placeholder.com/150?text=Admin',

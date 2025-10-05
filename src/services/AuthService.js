@@ -79,7 +79,6 @@ class AuthService {
     // Si los roles son ObjectId, popula los nombres
     let roleNames = [];
     if (user.roles && user.roles.length && typeof user.roles[0] !== 'string') {
-      // Si los roles no tienen 'name', hay que poblarlos
       const populatedUser = await userRepository.findById(user._id);
       roleNames = (populatedUser.roles || []).map(r => r.name);
     } else {

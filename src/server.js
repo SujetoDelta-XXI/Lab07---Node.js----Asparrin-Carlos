@@ -26,7 +26,6 @@ const app = express();
 // === Configuración EJS con ejs-mate ===
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
-// ✅ views está dentro de src, así que apuntamos a esa carpeta con ruta absoluta
 app.set('views', path.join(__dirname, 'views'));
 
 // === Archivos estáticos ===

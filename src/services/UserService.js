@@ -1,9 +1,8 @@
-// src/services/UserService.js (REEMPLAZO COMPLETO)
 import userRepository from '../repositories/UserRepository.js';
 
 class UserService {
   async getAll() {
-    return userRepository.findAll(); // ✅ corregido
+    return userRepository.findAll(); 
   }
 
   async getById(id) {

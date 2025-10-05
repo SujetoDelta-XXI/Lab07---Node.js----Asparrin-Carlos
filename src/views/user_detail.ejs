@@ -18,7 +18,7 @@
 
   async function load() {
     try {
-      const userId = location.pathname.split('/').pop(); // extrae el id
+      const userId = location.pathname.split('/').pop(); 
       const res = await fetchWithAuth(`/api/users/${userId}`);
       if (!res.ok) throw new Error('No se pudo obtener info');
       const u = await res.json();

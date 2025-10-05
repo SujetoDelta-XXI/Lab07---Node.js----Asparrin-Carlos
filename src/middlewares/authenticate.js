@@ -1,4 +1,3 @@
-// src/middlewares/authenticate.js (REEMPLAZO COMPLETO)
 import jwt from 'jsonwebtoken';
 import userRepository from '../repositories/UserRepository.js';
 
@@ -28,7 +27,7 @@ export default async function authenticate(req, res, next) {
 
     req.user = user;
     req.userId = user._id;
-    req.userRoles = (user.roles || []).map(r => r.name); // ✅ para authorize()
+    req.userRoles = (user.roles || []).map(r => r.name); 
 
     next();
   } catch {

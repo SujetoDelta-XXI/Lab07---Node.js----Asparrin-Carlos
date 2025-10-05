@@ -41,7 +41,6 @@
     const data = await res.json();
     saveToken(data.token);
 
-    // Determinar rol y redirigir
     try {
       const me = await (await fetch(`${API_BASE}/users/me`, {
         headers: { 'Authorization': `Bearer ${data.token}` }

@@ -58,12 +58,11 @@ class AuthController {
 
       const { token } = await authService.signIn({ email, password });
 
-      // ✅ Guardar token en cookie httpOnly
       res.cookie('token', token, {
         httpOnly: true,
-        secure: false,          // usa true si estás en HTTPS
+        secure: false,         
         sameSite: 'strict',
-        maxAge: 1000 * 60 * 60   // 1 hora
+        maxAge: 1000 * 60 * 60  
       });
 
       return res.status(200).json({ message: 'Login correcto', token });
