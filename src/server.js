@@ -58,7 +58,7 @@ const PORT = process.env.PORT || 3000;
 
 // === Conexión a MongoDB y seeders ===
 mongoose
-  .connect(process.env.MONGODB_URI, { autoIndex: true })
+  .connect(process.env.MONGO_URI, { autoIndex: true })
   .then(async () => {
     console.log('Mongo connected');
     await seedRoles();
